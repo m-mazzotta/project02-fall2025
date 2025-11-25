@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CreateTodo({ API_URL, onTodoCreated }) {  
-
+export default function CreateTodo({ API_URL, onTodoCreated }) {
     // User creates todo → handleSubmit runs
     // POST request succeeds → onTodoCreated() called
     // This calls refreshTodos() in App
@@ -20,8 +19,9 @@ export default function CreateTodo({ API_URL, onTodoCreated }) {
             body: JSON.stringify({ title, description, completed: false }),
         });
 
-        if (response.ok && onTodoCreated) {  // Add check for callback
-            onTodoCreated();  // Call the callback!
+        if (response.ok && onTodoCreated) {
+            // Add check for callback
+            onTodoCreated(); // Call the callback!
             setTitle('');
             setDescription('');
         }
@@ -44,7 +44,8 @@ export default function CreateTodo({ API_URL, onTodoCreated }) {
             />
             <button type="submit">Create TODO</button>
             <div className="side-note">
-                The todo list will automatically update after creating a new todo!
+                The todo list will automatically update after creating a new
+                todo!
             </div>
         </form>
     );

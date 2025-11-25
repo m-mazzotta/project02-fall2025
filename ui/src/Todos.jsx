@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Todos({ API_URL, refreshTrigger }) {  
-
+export default function Todos({ API_URL, refreshTrigger }) {
     // Adds refreshTrigger to useEffect dependencies
     // When refreshTrigger changes, useEffect runs again
     // This calls fetchTodos() to get the latest data
@@ -19,7 +18,7 @@ export default function Todos({ API_URL, refreshTrigger }) {
 
     useEffect(() => {
         fetchTodos();
-    }, [refreshTrigger]); 
+    }, [refreshTrigger]);
 
     async function deleteTodo(todoId) {
         await fetch(`${API_URL}/todos/${todoId}`, {
@@ -45,7 +44,9 @@ export default function Todos({ API_URL, refreshTrigger }) {
                             {todo.description}
                         </div>
                         {/* Add delete button */}
-                        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+                        <button onClick={() => deleteTodo(todo.id)}>
+                            Delete
+                        </button>
                     </li>
                 ))}
             </ul>
