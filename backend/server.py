@@ -16,13 +16,16 @@ HOW IT WORKS:
 # Step 1: Import what we need
 # os - Access environment variables
 import os
+
 # datetime - Handle timestamps
 from datetime import datetime
+
 # List, Optional - Type hints for function parameters
 from typing import List, Optional
 
 # dotenv - Load environment variables from .env file
 from dotenv import load_dotenv
+
 # FastAPI - The web framework
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,6 +55,7 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 # Each request will get its own session to query the database
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
+
 # Step 4: Create a function to get database sessions
 # This is called a "dependency" - FastAPI will automatically call this
 # for each request and pass the result to your endpoint functions
@@ -69,6 +73,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session  # Give the session to the endpoint
         # After the endpoint finishes, the session is automatically closed
+
 
 # Step 5: Define what our API requests and responses will look like
 # These are called "Pydantic models" or "schemas"
@@ -109,9 +114,11 @@ class TodoResponse(TodoBase):
     class Config:
         from_attributes = True
 
+
 # Step 6: Create the FastAPI app
 # This is the main application object - it handles all incoming requests
 app = FastAPI(title="TODO API", description="A simple CRUD API for managing TODO items")
+
 
 # Step 7: Create database tables on startup
 # This automatically creates all tables defined in your SQLAlchemy models
@@ -129,6 +136,7 @@ async def create_tables():
         # Use run_sync to run the synchronous create_all method
         await conn.run_sync(Base.metadata.create_all)
     print("✅ Database tables created successfully")
+
 
 # Step 8: Add CORS middleware to allow frontend requests
 # CORS (Cross-Origin Resource Sharing) is needed because your React app
@@ -161,6 +169,7 @@ async def get_all_todos(db: AsyncSession = Depends(get_db)):
     todos = result.scalars().all()
     return todos
 
+
 # READ: Get a single todo by ID
 @app.get("/todos/{todo_id}", response_model=TodoResponse)
 async def get_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
@@ -177,7 +186,8 @@ async def get_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
 
     return todo
 
-# Step 10: 
+
+# Step 10:
 # CREATE: Create a new todo
 @app.post("/todos", response_model=TodoResponse, status_code=201)
 async def create_todo(todo: TodoCreate, db: AsyncSession = Depends(get_db)):
@@ -202,7 +212,8 @@ async def create_todo(todo: TodoCreate, db: AsyncSession = Depends(get_db)):
 
     return db_todo
 
-# Step 11: 
+
+# Step 11:
 # UPDATE: Update an existing todo (PATCH - partial update)
 @app.patch("/todos/{todo_id}", response_model=TodoResponse)
 async def patch_todo(
@@ -234,6 +245,7 @@ async def patch_todo(
 
     return db_todo
 
+
 # DELETE: Delete a todo
 @app.delete("/todos/{todo_id}", status_code=204)
 async def delete_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
@@ -254,6 +266,7 @@ async def delete_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
     await db.commit()
 
     return None
+
 
 # Step 12: Serve static files (frontend) in production
 # This must come AFTER all API routes so API routes are matched first
@@ -279,6 +292,7 @@ if os.path.exists(static_dir):
         if os.path.exists(index_path):
             return FileResponse(index_path)
         raise HTTPException(status_code=404, detail="Frontend not found")
+
 
 # Step 13: Run the server
 # This code only runs if you execute the file directly (not if imported)
