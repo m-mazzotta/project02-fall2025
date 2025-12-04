@@ -1,13 +1,13 @@
 """
-Simple FastAPI Starter - TODO API
+Simple FastAPI Starter - note API
 ==================================
 
 This is a minimal FastAPI example, designed for beginners.
 It shows the basic structure of a REST API with database access.
 
 HOW IT WORKS:
-1. Client (your React app) makes a request to a URL (e.g., /todos)
-2. FastAPI finds the function decorated with @app.get("/todos")
+1. Client (your React app) makes a request to a URL (e.g., /notes)
+2. FastAPI finds the function decorated with @app.get("/notes")
 3. That function uses the database connection to query data
 4. The function returns data, which FastAPI converts to JSON
 5. The JSON is sent back to the client
@@ -36,7 +36,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
-from models import Base, Todo
+from models import Base, Note
 
 # Step 2: Load environment variables from .env file
 # Looks for .env file in current directory and parent directories
@@ -80,44 +80,46 @@ async def get_db():
 # They define the structure of data that will be sent to and from the API
 
 
-class TodoBase(BaseModel):
-    """Base schema with common fields for todos"""
+class NoteBase(BaseModel):
+    """Base schema with common fields for notes"""
 
     title: str
     description: Optional[str] = None
-    completed: bool = False
+    name: Optional[str] = None
+    img_url: Optional[str] = None
 
 
-class TodoCreate(TodoBase):
-    """Schema for creating a new todo"""
+class NoteCreate(NoteBase):
+    """Schema for creating a new note"""
 
     pass
 
 
-class TodoUpdate(BaseModel):
-    """Schema for updating a todo - all fields optional"""
+class NoteUpdate(BaseModel):
+    """Schema for updating a note - all fields optional"""
 
     title: Optional[str] = None
-    description: Optional[str] = None
-    completed: Optional[bool] = None
+    name: Optional[str] = None
+    img_url: Optional[str] = None
 
 
-class TodoResponse(TodoBase):
-    """What a todo looks like when we send it back to the client"""
+
+class NoteResponse(NoteBase):
+    """What a note looks like when we send it back to the client"""
 
     id: int
     created_at: datetime
     updated_at: datetime
 
     # This tells Pydantic to automatically convert SQLAlchemy models
-    # (like our Todo model) into this Pydantic model
+    # (like our note model) into this Pydantic model
     class Config:
         from_attributes = True
 
 
 # Step 6: Create the FastAPI app
 # This is the main application object - it handles all incoming requests
-app = FastAPI(title="TODO API", description="A simple CRUD API for managing TODO items")
+app = FastAPI(title="Note API", description="A simple CRUD API for managing note items")
 
 
 # Step 7: Create database tables on startup
@@ -129,7 +131,7 @@ async def create_tables():
     This uses SQLAlchemy to generate tables from your model definitions.
     Works for both Docker and Railway databases.
 
-    Note: Docker Compose's depends_on: service_healthy ensures the database
+    note: Docker Compose's depends_on: service_healthy ensures the database
     is ready before this code runs.
     """
     async with engine.begin() as conn:
@@ -142,7 +144,7 @@ async def create_tables():
 # CORS (Cross-Origin Resource Sharing) is needed because your React app
 # runs on a different port (5173) than your API (8000)
 # Without this, browsers would block requests from your frontend
-# Note: In production with combined deployment, CORS may not be needed
+# note: In production with combined deployment, CORS may not be needed
 # but we keep it for development flexibility
 app.add_middleware(
     CORSMiddleware,
@@ -153,116 +155,117 @@ app.add_middleware(
 )
 
 # Step 9: Create our API endpoints
-# These are the URLs that clients can visit to interact with todos
+# These are the URLs that clients can visit to interact with notes
 # IMPORTANT: API routes must be defined BEFORE the SPA catch-all route
 
 
-# READ: Get all todos
-@app.get("/todos", response_model=List[TodoResponse])
-async def get_all_todos(db: AsyncSession = Depends(get_db)):
+# READ: Get all notes
+@app.get("/notes", response_model=List[NoteResponse])
+async def get_all_notes(db: AsyncSession = Depends(get_db)):
     """
-    Get all todos from the database.
+    Get all notes from the database.
 
-    Returns: A list of all todos in the database
+    Returns: A list of all notes in the database
     """
-    result = await db.execute(select(Todo))
-    todos = result.scalars().all()
-    return todos
+    result = await db.execute(select(Note))
+    notes = result.scalars().all()
+    return notes
 
 
-# READ: Get a single todo by ID
-@app.get("/todos/{todo_id}", response_model=TodoResponse)
-async def get_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
+# READ: Get a single note by ID
+@app.get("/notes/{note_id}", response_model=NoteResponse)
+async def get_note(note_id: int, db: AsyncSession = Depends(get_db)):
     """
-    Get a single todo by its ID.
+    Get a single note by its ID.
 
-    Returns: The todo if found, or a 404 error if not
+    Returns: The note if found, or a 404 error if not
     """
-    result = await db.execute(select(Todo).where(Todo.id == todo_id))
-    todo = result.scalar_one_or_none()
+    result = await db.execute(select(note).where(note.id == note_id))
+    note = result.scalar_one_or_none()
 
-    if todo is None:
-        raise HTTPException(status_code=404, detail=f"Todo with ID {todo_id} not found")
+    if note is None:
+        raise HTTPException(status_code=404, detail=f"note with ID {note_id} not found")
 
-    return todo
+    return note
 
 
 # Step 10:
-# CREATE: Create a new todo
-@app.post("/todos", response_model=TodoResponse, status_code=201)
-async def create_todo(todo: TodoCreate, db: AsyncSession = Depends(get_db)):
+# CREATE: Create a new note
+@app.post("/notes", response_model=NoteResponse, status_code=201)
+async def create_note(note: NoteCreate, db: AsyncSession = Depends(get_db)):
     """
-    Create a new todo item.
+    Create a new note item.
 
-    Returns: The created todo
+    Returns: The created note
     """
-    # Create a new Todo object from the request data
-    db_todo = Todo(
-        title=todo.title,
-        description=todo.description,
-        completed=todo.completed,
+    # Create a new note object from the request data
+    db_note = Note(
+        title=note.title,
+        description=note.description,
+        name=note.name,
+        img_url= note.img_url
     )
 
     # Add it to the database session
-    db.add(db_todo)
+    db.add(db_note)
     # Commit the transaction to save it
     await db.commit()
     # Refresh to get the updated data (like the generated ID)
-    await db.refresh(db_todo)
+    await db.refresh(db_note)
 
-    return db_todo
+    return db_note
 
 
 # Step 11:
-# UPDATE: Update an existing todo (PATCH - partial update)
-@app.patch("/todos/{todo_id}", response_model=TodoResponse)
-async def patch_todo(
-    todo_id: int, todo_update: TodoUpdate, db: AsyncSession = Depends(get_db)
+# UPDATE: Update an existing note (PATCH - partial update)
+@app.patch("/notes/{note_id}", response_model=NoteResponse)
+async def patch_note(
+    note_id: int, note_update: NoteUpdate, db: AsyncSession = Depends(get_db)
 ):
     """
-    Partially update an existing todo item (PATCH).
+    Partially update an existing note item (PATCH).
     Only the fields provided in the request will be updated.
-    Returns: The updated todo, or a 404 error if not found
+    Returns: The updated note, or a 404 error if not found
     """
-    # Get the existing todo
-    result = await db.execute(select(Todo).where(Todo.id == todo_id))
-    db_todo = result.scalar_one_or_none()
+    # Get the existing note
+    result = await db.execute(select(Note).where(Note.id == note_id))
+    db_note = result.scalar_one_or_none()
 
-    if db_todo is None:
-        raise HTTPException(status_code=404, detail=f"Todo with ID {todo_id} not found")
+    if db_note is None:
+        raise HTTPException(status_code=404, detail=f"note with ID {note_id} not found")
 
     # Update only the fields that were provided
-    update_data = todo_update.model_dump(exclude_unset=True)
+    update_data = note_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
-        setattr(db_todo, field, value)
+        setattr(db_note, field, value)
 
     # Update the updated_at timestamp
-    db_todo.updated_at = datetime.utcnow()
+    db_note.updated_at = datetime.utcnow()
 
     # Commit the changes
     await db.commit()
-    await db.refresh(db_todo)
+    await db.refresh(db_note)
 
-    return db_todo
+    return db_note
 
 
-# DELETE: Delete a todo
-@app.delete("/todos/{todo_id}", status_code=204)
-async def delete_todo(todo_id: int, db: AsyncSession = Depends(get_db)):
+# DELETE: Delete a note
+@app.delete("/notes/{note_id}", status_code=204)
+async def delete_note(note_id: int, db: AsyncSession = Depends(get_db)):
     """
-    Delete a todo item.
+    Delete a note item.
 
     Returns: 204 No Content if successful, or a 404 error if not found
     """
-    # Get the existing todo
-    result = await db.execute(select(Todo).where(Todo.id == todo_id))
-    db_todo = result.scalar_one_or_none()
+    # Get the existing note
+    result = await db.execute(select(Note).where(Note.id == note_id))
+    db_note = result.scalar_one_or_none()
 
-    if db_todo is None:
-        raise HTTPException(status_code=404, detail=f"Todo with ID {todo_id} not found")
+    if db_note is None:
+        raise HTTPException(status_code=404, detail=f"note with ID {note_id} not found")
 
     # Delete it from the database
-    await db.delete(db_todo)
+    await db.delete(db_note)
     await db.commit()
 
     return None
@@ -304,6 +307,6 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
-# Note: The server will be run in Docker (see Docker Configuration section)
+# note: The server will be run in Docker (see Docker Configuration section)
 # If you have Poetry installed locally, you can also run:
 # poetry run uvicorn server:app --reload

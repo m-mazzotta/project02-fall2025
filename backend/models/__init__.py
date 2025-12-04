@@ -1,4 +1,4 @@
 from .base import Base
-from .todo import Todo
+from .note import Note
 
-__all__ = ["Base", "Todo"]
+__all__ = ["Base", "Note"]
