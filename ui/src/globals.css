@@ -1,0 +1,106 @@
+body {
+    font-family:
+        'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans',
+        Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+header {
+    background-color: rgb(36, 205, 123);
+    color: black;
+    padding: 10px;
+    text-align: center;
+}
+
+main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    width: 100%;
+}
+
+/* todos */
+.todos-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    border: dashed 3px rgb(36, 205, 123);
+}
+
+span {
+    font-weight: bold;
+    color: black;
+    background-color: rgb(36, 205, 123);
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+
+/* form styling */
+.form-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-container input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* button styling */
+button {
+    padding: 5px 10px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cc0000;
+}
+
+.side-note {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.noteImage {
+    width: 50%;
+}
+
+.notes-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 30px;
+    width: 100%;
+}
+
+.delbutton,
+.createbutton {
+    background-color: rgb(36, 205, 123) !important; /* green */
+    border-color: rgb(36, 205, 123) !important;
+    color: white !important;
+}
+
+.delbutton:hover,
+.createbutton:hover {
+    background-color: rgb(27, 155, 93) !important; /* darker green */
+    border-color: rgb(27, 155, 93) !important;
+}
