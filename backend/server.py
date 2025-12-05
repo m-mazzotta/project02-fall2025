@@ -179,7 +179,7 @@ async def get_note(note_id: int, db: AsyncSession = Depends(get_db)):
 
     Returns: The note if found, or a 404 error if not
     """
-    result = await db.execute(select(note).where(note.id == note_id))
+    result = await db.execute(select(Note).where(Note.id == note_id))
     note = result.scalar_one_or_none()
 
     if note is None:
