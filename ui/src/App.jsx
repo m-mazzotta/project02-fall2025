@@ -20,7 +20,7 @@ export default function App() {
     return (
         <>
             <header>
-                <h1>Note List</h1>
+                <h1>My Notes List</h1>
             </header>
             <main>
                 <Notes API_URL={API_URL} refreshTrigger={refreshTrigger} />

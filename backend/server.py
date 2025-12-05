@@ -103,7 +103,6 @@ class NoteUpdate(BaseModel):
     img_url: Optional[str] = None
 
 
-
 class NoteResponse(NoteBase):
     """What a note looks like when we send it back to the client"""
 
@@ -203,7 +202,7 @@ async def create_note(note: NoteCreate, db: AsyncSession = Depends(get_db)):
         title=note.title,
         description=note.description,
         name=note.name,
-        img_url= note.img_url
+        img_url=note.img_url,
     )
 
     # Add it to the database session

@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Card, Button } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 export default function Notes({ API_URL, refreshTrigger }) {
     // Adds refreshTrigger to useEffect dependencies
@@ -30,24 +33,29 @@ export default function Notes({ API_URL, refreshTrigger }) {
 
     return (
         <div className="notes-container">
-            <ul>
-                {noteList.map((note) => (
-                    <li key={note.id}>
-                        <div>
-                            {note.title}
-                            <br />
-                            {note.description}
-                            <br />
-                            {note.name}
-                            <img className='noteImage' src={note.img_url} alt="image" />
-                        </div>
-                        {/* Add delete button */}
-                        <button onClick={() => deleteNote(note.id)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            {noteList.map((note) => (
+                <Card key={note.id} style={{ width: 350 }}>
+                    <div>
+                        <h3>{note.title}</h3>
+                        <p>{note.description}</p>
+                        <p>
+                            <b>Note By</b> {note.name}
+                        </p>
+                        <img
+                            className="noteImage"
+                            src={note.img_url}
+                            alt="note"
+                        />
+                    </div>
+                    <Button
+                        type="primary"
+                        className="delbutton"
+                        onClick={() => deleteNote(note.id)}
+                    >
+                        <FontAwesomeIcon icon={faTrashCan} />
+                    </Button>
+                </Card>
+            ))}
         </div>
     );
 }
